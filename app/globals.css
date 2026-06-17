@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  color: #2a2350;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #ffd6ec 0%, transparent 55%),
+    radial-gradient(1000px 700px at 100% 0%, #c2e9fb 0%, transparent 50%),
+    radial-gradient(900px 800px at 50% 120%, #e0c3fc 0%, transparent 55%),
+    linear-gradient(160deg, #fef6ff 0%, #f2fbff 50%, #f6f0ff 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* なめらかスクロール & スクロールバー */
+* {
+  scroll-behavior: smooth;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #e0c3fc, #c2e9fb);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  /* ガラス風カード */
+  .glass {
+    @apply bg-white/55 backdrop-blur-xl border border-white/60 shadow-soft;
+  }
+  .glass-strong {
+    @apply bg-white/75 backdrop-blur-xl border border-white/70 shadow-soft;
+  }
+
+  /* グラデーション文字 */
+  .grad-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, #b06ab3, #4568dc, #3fb6c0);
+    background-size: 200% 200%;
+    animation: shimmer 8s ease infinite;
+  }
+
+  /* 主役ボタン */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold text-white shadow-glow transition-all duration-200;
+    background-image: linear-gradient(120deg, #c779d0, #8a64e8, #4bc0c8);
+    background-size: 180% 180%;
+  }
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    background-position: 100% 50%;
+    box-shadow: 0 14px 48px -10px rgba(150, 110, 240, 0.6);
+  }
+  .btn-primary:active {
+    @apply translate-y-0 scale-95;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-medium text-ink bg-white/60 border border-white/70 transition-all duration-200 hover:bg-white/90 hover:-translate-y-0.5;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium transition-all duration-150 cursor-pointer select-none;
+  }
+  .chip-on {
+    @apply text-white shadow-soft;
+    background-image: linear-gradient(120deg, #c779d0, #6a82fb);
+  }
+  .chip-off {
+    @apply bg-white/70 text-ink-soft border border-white/70 hover:bg-white;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-white/70 bg-white/70 px-4 py-3 text-ink outline-none transition-all duration-150 placeholder:text-ink-faint focus:border-aurora-lilac focus:bg-white focus:ring-4 focus:ring-aurora-lilac/40;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink-soft;
+  }
+}
