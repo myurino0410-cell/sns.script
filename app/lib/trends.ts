@@ -151,6 +151,37 @@ export function computeDigest(now = new Date()): TrendDigest {
   return { weekOf, generatedAt: now.getTime(), videos };
 }
 
+// 直近1ヶ月で人気の動画（最新人気カテゴリ用）。
+// 週次より広い母数・高い再生数で、月間の定番化したフォーマットを抽出する。
+export function computeMonthlyPopular(now = new Date()): TrendVideo[] {
+  const monthKey = `${now.getUTCFullYear()}-${now.getUTCMonth()}`;
+  const rng = seededRandom(Number(monthKey.replaceAll("-", "")) + 7);
+
+  return SEED_POOL.map((seed, i) => {
+    const growthPct = Math.round(80 + rng() * 320); // 月間は伸び幅が大きい
+    const engagementPct = Math.round((5 + rng() * 13) * 10) / 10;
+    const views = Math.round((400 + rng() * 2600) * 1000); // 40万〜300万
+    const score = Math.min(
+      99,
+      Math.round(
+        seed.baseScore * 0.45 +
+          (growthPct / 400) * 25 +
+          (engagementPct / 18) * 15 +
+          (views / 3_000_000) * 15,
+      ),
+    );
+    return {
+      id: `m-${monthKey}-${i}`,
+      platform: seed.platform,
+      title: seed.title,
+      format: seed.format,
+      reason: `直近1ヶ月で安定して伸び続けている定番フォーマット。${seed.reason}`,
+      tags: seed.tags,
+      metrics: { views, growthPct, engagementPct, score },
+    };
+  }).sort((a, b) => b.metrics.score - a.metrics.score);
+}
+
 export function readStoredDigest(): TrendDigest | null {
   try {
     const raw = fs.readFileSync(STORE, "utf-8");

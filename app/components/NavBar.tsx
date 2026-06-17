@@ -10,12 +10,14 @@ import {
   UserCircle2,
   Activity,
   PlayCircle,
+  LayoutGrid,
 } from "lucide-react";
 
 const links = [
   { href: "/", label: "ホーム", icon: Home },
-  { href: "/demo", label: "デモ", icon: PlayCircle },
+  { href: "/categories", label: "カテゴリ", icon: LayoutGrid },
   { href: "/create", label: "台本作成", icon: PenLine },
+  { href: "/demo", label: "デモ", icon: PlayCircle },
   { href: "/profile", label: "プロフィール", icon: UserCircle2 },
   { href: "/diagnostics", label: "診断", icon: Activity },
 ];

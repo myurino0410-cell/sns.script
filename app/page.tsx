@@ -11,6 +11,7 @@ import {
   ArrowRight,
   Rocket,
   PlayCircle,
+  LayoutGrid,
 } from "lucide-react";
 import { TrendCard } from "./components/TrendCard";
 import { TrendDigest, TrendVideo, UserProfile } from "./lib/types";
@@ -76,6 +77,10 @@ export default function HomePage() {
             <Link href="/create" className="btn-primary">
               <Wand2 className="h-5 w-5" />
               台本を作る
+            </Link>
+            <Link href="/categories" className="btn-ghost">
+              <LayoutGrid className="h-4 w-4" />
+              カテゴリから選ぶ
             </Link>
             <Link href="/profile" className="btn-ghost">
               {ready ? "プロフィールを編集" : "まずは初期設定"}

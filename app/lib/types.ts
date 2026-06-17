@@ -59,7 +59,47 @@ export interface ScriptRequest {
   durationSec: number; // 尺（秒）
   profile: UserProfile;
   trendHint?: TrendVideo; // おすすめ動画から来た場合のヒント
+  category?: ScriptCategory; // カテゴリ指定から来た場合のヒント
 }
+
+// 台本カテゴリのグループ
+export type CategoryGroup =
+  | "theme" // テーマ別
+  | "industry" // 業界別
+  | "businessType" // 業種別
+  | "trend" // トレンド別
+  | "female" // 女性向け
+  | "male" // 男性向け
+  | "recruiting" // 採用向け
+  | "popular"; // 最新人気（直近1ヶ月）
+
+export const CATEGORY_GROUP_LABEL: Record<CategoryGroup, string> = {
+  theme: "テーマ別",
+  industry: "業界別",
+  businessType: "業種別",
+  trend: "トレンド別",
+  female: "女性向け",
+  male: "男性向け",
+  recruiting: "採用向け",
+  popular: "最新人気",
+};
+
+// 1つの台本カテゴリ（選ぶと生成内容に反映される）
+export interface ScriptCategory {
+  id: string;
+  group: CategoryGroup;
+  label: string;
+  emoji: string;
+  desc: string;
+  angle: string; // 生成時に効く方向づけ
+  toneOverride?: Tone[];
+  goalOverride?: Goal[];
+  industryOverride?: string;
+  roleOverride?: string;
+  audienceHint?: string;
+  formatHint?: string;
+}
+
 
 // 生成された台本
 export interface ScriptScene {

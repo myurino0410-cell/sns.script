@@ -17,17 +17,37 @@ function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+// カテゴリ指定をプロフィールに反映した実効リクエストを作る
+function applyCategory(req: ScriptRequest): ScriptRequest {
+  const c = req.category;
+  if (!c) return req;
+  const profile = { ...req.profile };
+  if (c.industryOverride) profile.industry = c.industryOverride;
+  if (c.roleOverride) profile.role = c.roleOverride;
+  if (c.audienceHint)
+    profile.audience = profile.audience
+      ? `${profile.audience}（特に${c.audienceHint}）`
+      : c.audienceHint;
+  if (c.toneOverride?.length) profile.tones = c.toneOverride;
+  if (c.goalOverride?.length) profile.goals = c.goalOverride;
+  return { ...req, profile };
+}
+
 function buildPrompt(req: ScriptRequest): string {
-  const { profile, topic, durationSec, trendHint } = req;
+  const { profile, topic, durationSec, trendHint, category } = req;
   const goals = profile.goals.map((g) => GOAL_LABEL[g]).join("・");
   const tones = profile.tones.map((t) => TONE_LABEL[t]).join("・");
   const platforms = profile.platforms.map((p) => PLATFORM_LABEL[p]).join("・");
   const trend = trendHint
     ? `\n参考にすべき今週のトレンドの型: 「${trendHint.format}」 / ${trendHint.title}\n伸びている理由: ${trendHint.reason}`
     : "";
+  const cat = category
+    ? `\n# カテゴリ指定（最優先で反映）\n- カテゴリ: ${category.label}（${category.desc}）\n- 方向づけ: ${category.angle}${category.formatHint ? `\n- 推奨フォーマット: ${category.formatHint}` : ""}`
+    : "";
 
   return `あなたは一流のSNSショート動画ディレクター兼コピーライターです。
 以下の条件で、${durationSec}秒のショート動画の企画台本を作ってください。
+${cat}
 
 # クライアント情報
 - 業界: ${profile.industry}
@@ -117,10 +137,11 @@ function splitScenes(durationSec: number): { tc: string; ratio: number }[] {
 }
 
 export function generateWithTemplate(req: ScriptRequest): GeneratedScript {
-  const { profile, topic, durationSec, trendHint } = req;
+  const { profile, topic, durationSec, trendHint, category } = req;
   const audience = profile.audience || "視聴者";
   const role = profile.role || "発信者";
-  const format = trendHint?.format ?? "結論ファースト";
+  const format =
+    category?.formatHint ?? trendHint?.format ?? "結論ファースト";
   const slots = splitScenes(durationSec);
 
   const hook = `「${topic}」、実は${audience}の9割が損してます。`;
@@ -165,15 +186,20 @@ export function generateWithTemplate(req: ScriptRequest): GeneratedScript {
     t.startsWith("#") ? t : `#${t}`,
   );
 
+  const catTags = category ? [`#${category.label}`] : [];
+
   return {
     id: uid(),
-    title: `${topic}｜${audience}が思わず保存する${durationSec}秒`,
+    title: `${category ? `【${category.label}】` : ""}${topic}｜${audience}が思わず保存する${durationSec}秒`,
     hook,
     scenes,
     cta,
     caption: `${topic}について${role}が解説！\n${audience}の人はぜひ最後まで👀\n${cta}`,
-    hashtags: Array.from(new Set([...baseTags, ...platTags, ...trendTags])),
+    hashtags: Array.from(
+      new Set([...baseTags, ...catTags, ...platTags, ...trendTags]),
+    ),
     tips: [
+      ...(category ? [`カテゴリ「${category.label}」: ${category.angle}`] : []),
       "冒頭3秒は『顔＋大きいテロップ＋結論』で離脱を防ぐ。",
       "BGMはトレンド音源を使うとアルゴリズム評価が上がりやすい。",
       "テロップは1画面1メッセージ。読める速度を意識する。",
@@ -184,10 +210,11 @@ export function generateWithTemplate(req: ScriptRequest): GeneratedScript {
   };
 }
 
-// 入口：AI→ダメならテンプレ
+// 入口：カテゴリを反映 → AI→ダメならテンプレ
 export async function generateScript(
   req: ScriptRequest,
 ): Promise<GeneratedScript> {
-  const ai = await generateWithAI(req);
-  return ai ?? generateWithTemplate(req);
+  const eff = applyCategory(req);
+  const ai = await generateWithAI(eff);
+  return ai ?? generateWithTemplate(eff);
 }

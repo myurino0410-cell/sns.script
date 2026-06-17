@@ -4,8 +4,22 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wand2, Clock, AlertCircle, Loader2, Flame, RefreshCw } from "lucide-react";
-import { GeneratedScript, TrendVideo, UserProfile } from "../lib/types";
+import {
+  Wand2,
+  Clock,
+  AlertCircle,
+  Loader2,
+  Flame,
+  RefreshCw,
+  LayoutGrid,
+  X,
+} from "lucide-react";
+import {
+  GeneratedScript,
+  ScriptCategory,
+  TrendVideo,
+  UserProfile,
+} from "../lib/types";
 import { loadProfile, isProfileComplete } from "../lib/profile";
 import { ScriptResult } from "../components/ScriptResult";
 
@@ -17,6 +31,7 @@ function CreateInner() {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState(30);
   const [trend, setTrend] = useState<TrendVideo | null>(null);
+  const [category, setCategory] = useState<ScriptCategory | null>(null);
   const [script, setScript] = useState<GeneratedScript | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +49,11 @@ function CreateInner() {
     } else if (from === "demo") {
       const t = sessionStorage.getItem("trendy-studio.demoTopic");
       if (t) setTopic(t);
+    } else if (from === "category") {
+      const rawC = sessionStorage.getItem("trendy-studio.pickedCategory");
+      if (rawC) setCategory(JSON.parse(rawC) as ScriptCategory);
+      const rawT = sessionStorage.getItem("trendy-studio.pickedTrend");
+      if (rawT) setTrend(JSON.parse(rawT) as TrendVideo);
     }
   }, [params]);
 
@@ -53,6 +73,7 @@ function CreateInner() {
           durationSec: duration,
           profile,
           trendHint: trend ?? undefined,
+          category: category ?? undefined,
         }),
       });
       const data = await res.json();
@@ -96,10 +117,43 @@ function CreateInner() {
         animate={{ opacity: 1, y: 0 }}
         className="glass-strong rounded-xl3 p-6 sm:p-8"
       >
-        <h1 className="text-2xl font-extrabold">台本をつくる</h1>
-        <p className="mt-1 text-sm text-ink-soft">
-          {profile?.industry} / {profile?.role} 向けに最適化されています。
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-extrabold">台本をつくる</h1>
+            <p className="mt-1 text-sm text-ink-soft">
+              {profile?.industry} / {profile?.role} 向けに最適化されています。
+            </p>
+          </div>
+          <Link href="/categories" className="btn-ghost !py-2 !text-sm">
+            <LayoutGrid className="h-4 w-4" />
+            カテゴリ
+          </Link>
+        </div>
+
+        {category && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mt-4 flex items-center justify-between gap-3 rounded-xl2 bg-gradient-to-r from-aurora-lilac/50 to-aurora-sky/50 p-4"
+          >
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-xl">{category.emoji}</span>
+              <div>
+                <p className="font-bold text-ink">
+                  カテゴリ「{category.label}」で作成中
+                </p>
+                <p className="text-ink-soft">{category.desc}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setCategory(null)}
+              className="rounded-full bg-white/70 p-1.5 text-ink-soft transition hover:bg-white"
+              aria-label="カテゴリを解除"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </motion.div>
+        )}
 
         {trend && (
           <motion.div
