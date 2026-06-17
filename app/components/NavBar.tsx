@@ -3,10 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Sparkles, Home, PenLine, UserCircle2, Activity } from "lucide-react";
+import {
+  Sparkles,
+  Home,
+  PenLine,
+  UserCircle2,
+  Activity,
+  PlayCircle,
+} from "lucide-react";
 
 const links = [
   { href: "/", label: "ホーム", icon: Home },
+  { href: "/demo", label: "デモ", icon: PlayCircle },
   { href: "/create", label: "台本作成", icon: PenLine },
   { href: "/profile", label: "プロフィール", icon: UserCircle2 },
   { href: "/diagnostics", label: "診断", icon: Activity },

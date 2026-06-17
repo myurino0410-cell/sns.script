@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Sparkles, CalendarClock, Wand2, ArrowRight, Rocket } from "lucide-react";
+import {
+  Sparkles,
+  CalendarClock,
+  Wand2,
+  ArrowRight,
+  Rocket,
+  PlayCircle,
+} from "lucide-react";
 import { TrendCard } from "./components/TrendCard";
 import { TrendDigest, TrendVideo, UserProfile } from "./lib/types";
 import { loadProfile, isProfileComplete } from "./lib/profile";
@@ -73,6 +80,10 @@ export default function HomePage() {
             <Link href="/profile" className="btn-ghost">
               {ready ? "プロフィールを編集" : "まずは初期設定"}
               <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/demo" className="btn-ghost">
+              <PlayCircle className="h-4 w-4" />
+              デモで試す
             </Link>
           </div>
         </motion.div>

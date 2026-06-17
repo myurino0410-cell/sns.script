@@ -23,13 +23,17 @@ function CreateInner() {
 
   useEffect(() => {
     setProfile(loadProfile());
-    if (params.get("from") === "trend") {
+    const from = params.get("from");
+    if (from === "trend") {
       const raw = sessionStorage.getItem("trendy-studio.pickedTrend");
       if (raw) {
         const v = JSON.parse(raw) as TrendVideo;
         setTrend(v);
         setTopic(`${v.format}の型で、自分の発信に合わせた動画`);
       }
+    } else if (from === "demo") {
+      const t = sessionStorage.getItem("trendy-studio.demoTopic");
+      if (t) setTopic(t);
     }
   }, [params]);
 
